@@ -200,4 +200,124 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     setInterval(draw, 33);
+
+    const grantAccessButton = document.getElementById('grant-access');
+    const hackerTerminal = document.getElementById('hacker-terminal');
+    const terminalClose = document.querySelector('.terminal-button.close');
+    const terminalInput = document.getElementById('terminal-input');
+    const terminalOutput = document.querySelector('.terminal-output');
+
+    grantAccessButton.addEventListener('click', () => {
+        document.getElementById('access-popup').style.display = 'none';
+        setTimeout(() => {
+            hackerTerminal.style.display = 'block';
+            initializeTerminal();
+        }, 1000);
+    });
+
+    terminalClose.addEventListener('click', () => {
+        hackerTerminal.style.display = 'none';
+    });
+
+    terminalInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const command = terminalInput.value.trim().toLowerCase();
+            processCommand(command);
+            terminalInput.value = '';
+        }
+    });
+
+    function showWelcomeMessage() {
+        appendToTerminal('Welcome to M0SK4N0R\'s Hacking Terminal', 'system');
+        appendToTerminal('Type "help" for available commands', 'system');
+        appendToTerminal('');
+        // We don't need to add an extra prompt here
+    }
+
+    function appendToTerminal(text, type = 'command') {
+        const p = document.createElement('p');
+        if (type === 'command') {
+            p.innerHTML = `<span class="terminal-prompt">moskanor@hackbox:~$</span> ${text}`;
+        } else {
+            p.innerHTML = text;
+        }
+        p.classList.add(type);
+        terminalOutput.appendChild(p);
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    }
+
+    function initializeTerminal() {
+        showWelcomeMessage();
+        updatePrompt();
+    }
+
+    function updatePrompt() {
+        const promptSpan = document.querySelector('.terminal-prompt');
+        if (promptSpan) {
+            promptSpan.textContent = '';
+        } else {
+            const promptLine = document.createElement('p');
+            promptLine.innerHTML = '<span class="terminal-prompt">moskanor@hackbox:~$</span>';
+            terminalOutput.appendChild(promptLine);
+        }
+        terminalInput.focus();
+    }
+
+    function processCommand(command) {
+        appendToTerminal(command);
+
+        switch (command) {
+            case 'help':
+                appendToTerminal('Available commands:', 'output');
+                appendToTerminal('  help     - Show this help message', 'output');
+                appendToTerminal('  whoami   - Display current user', 'output');
+                appendToTerminal('  ls       - List directory contents', 'output');
+                appendToTerminal('  cat      - Read file contents', 'output');
+                appendToTerminal('  nmap     - Network exploration tool', 'output');
+                appendToTerminal('  clear    - Clear the terminal', 'output');
+                break;
+            case 'whoami':
+                appendToTerminal('moskanor - Ethical hacker and cybersecurity specialist', 'output');
+                break;
+            case 'ls':
+                appendToTerminal('projects/  tools/  secrets.txt  backdoor.sh', 'output');
+                break;
+            case 'cat secrets.txt':
+                appendToTerminal('Access denied. Nice try, hacker!', 'error');
+                break;
+            case 'nmap':
+                simulateNmap();
+                break;
+            case 'clear':
+                terminalOutput.innerHTML = '';
+                break;
+            default:
+                appendToTerminal(`Command not found: ${command}. Type "help" for available commands.`, 'error');
+        }
+    }
+
+    function simulateNmap() {
+        const nmapOutput = [
+            'Starting Nmap 7.92 ( https://nmap.org ) at 2024-03-15 12:00 UTC',
+            'Nmap scan report for target.com (203.0.113.1)',
+            'Host is up (0.015s latency).',
+            'Not shown: 997 closed tcp ports',
+            'PORT   STATE SERVICE',
+            '22/tcp open  ssh',
+            '80/tcp open  http',
+            '443/tcp open  https',
+            '',
+            'Nmap done: 1 IP address (1 host up) scanned in 0.5 seconds'
+        ];
+
+        let i = 0;
+        const nmapInterval = setInterval(() => {
+            if (i < nmapOutput.length) {
+                appendToTerminal(nmapOutput[i], 'output');
+                i++;
+            } else {
+                clearInterval(nmapInterval);
+            }
+        }, 300);
+    }
 });
